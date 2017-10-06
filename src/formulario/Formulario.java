@@ -14,6 +14,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JTextField;
+
+import dominio.BaseDados;
+import dominio.Pessoa;
+
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -36,10 +40,11 @@ public class Formulario extends JFrame {
 	private JTextField inputNome;
 	private JTextField inputIdade;
 	private JLabel mensagem;
-	private Vector<String> pessoas;
 	private JList<String> lista;
 	private JScrollPane scroll;
 	private boolean hasNewPerson;
+
+	private BaseDados basedados;
 	
 	/**
 	 * Construtor da janela do formulário.
@@ -59,16 +64,16 @@ public class Formulario extends JFrame {
 		this.inputNome = new JTextField(10);
 		this.inputIdade = new JTextField(10);
 		this.mensagem = new JLabel("Adicione uma pessoa");
-		this.pessoas = new Vector<String>();
 		this.lista = new JList<String>();
 		this.scroll = new JScrollPane(lista);
 		this.hasNewPerson = false;
+		this.basedados = new BaseDados();
 	}
 	
 	/**
 	 * Define toda a interface gráfica da janela, incluindo layouts ações de botões e posição dos elementos (labels, botões...).
 	 */
-	public void janela() {
+	public void fazerJanela() {
 		
 		setTitle("Cadastro de pessoas");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -105,11 +110,9 @@ public class Formulario extends JFrame {
 		grid.gridy = 3;
 		panelForm.add(buttonListar, grid);
 		
-
 		grid.weightx = 0;
 		grid.gridy = 2;
 		panelMens.add(mensagem);
-		
 		
 		panelList.setLayout(new GridLayout(2, 1));
 		panelList.add(scroll);
@@ -123,8 +126,8 @@ public class Formulario extends JFrame {
 						int idade = Integer.parseInt(inputIdade.getText());
 						String nome = inputNome.getText();
 						Pessoa pessoa = new Pessoa(nome, idade);
-						JLabel labelPessoa = new JLabel(pessoa.toString());
-						pessoas.add(labelPessoa.getText());
+						basedados.cadastrarPessoa(pessoa);
+						
 						mensagem.setText("Pessoa adicionada!");
 						mensagem.setForeground(Color.green);
 						
@@ -143,9 +146,10 @@ public class Formulario extends JFrame {
 		buttonListar.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				if(!pessoas.isEmpty()) {
+				if(!basedados.isEmpty()) {
 					if(hasNewPerson) {
-						lista.setListData(pessoas);
+						Vector<String> registros = basedados.getPessoas();
+						lista.setListData(registros);
 						mensagem.setText("Adicione uma pessoa");
 						mensagem.setForeground(Color.black);
 					} else {
@@ -172,11 +176,5 @@ public class Formulario extends JFrame {
 		panel.add(panelList);
 		
 		add(panel);
-	}
-	
-	public static void main(String[] args) {
-		Formulario form = new Formulario();
-		form.setVisible(true);
-		form.janela();
 	}
 }
